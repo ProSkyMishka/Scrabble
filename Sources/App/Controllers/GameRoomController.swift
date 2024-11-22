@@ -34,14 +34,6 @@ struct GameRoomController: RouteCollection {
         
         var board = Array(repeating: Array(repeating: "1" as String, count: 15), count: 15)
         board[7][7] = "5"
-        var boardStr: [String] = []
-        for i in board {
-            var str = ""
-            for j in 0...13 {
-                str += "\(i[j]),"
-            }
-            boardStr.append(str + i[14])
-        }
         let gameRoom = GameRoom(
             adminID: payload.userID,
             board: GameRoom().toString(board: board),
@@ -106,6 +98,7 @@ struct GameRoomController: RouteCollection {
             .filter(\.$room.$id == room.requireID())
             .filter(\.$player.$id == nil)
             .filter(\.$onBoard == false)
+            .sort(.custom("RANDOM()"))
             .limit(7)
             .all()
         
@@ -238,7 +231,6 @@ struct GameRoomController: RouteCollection {
             } else {
                 room.turn += 1
             }
-            print(result.1)
             try await room.save(on: req.db)
         }
         
